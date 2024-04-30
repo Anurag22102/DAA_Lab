@@ -1,42 +1,52 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
 
 using namespace std;
 
-const int n = 4;
-const int MAX = 1000000;
 
-int dist[n + 1][n + 1] = {
-	{ 0, 0, 0, 0, 0 }, { 0, 0, 10, 15, 20 },
-	{ 0, 10, 0, 25, 25 }, { 0, 15, 25, 0, 30 },
-	{ 0, 20, 25, 30, 0 },
-};
+const int INF = 1e9;
 
-int memo[n + 1][1 << (n + 1)];
 
-int fun(int i, int mask)
-{
-	if (mask == ((1 << i) | 3))
-		return dist[1][i];
-		
-	if (memo[i][mask] != 0)
-		return memo[i][mask];
+int tsp(const vector<vector<int>>& graph, int n) {
+    vector<vector<int>> dp(1 << n, vector<int>(n, INF));
+    dp[1][0] = 0;
 
-	int res = MAX;
 
-	for (int j = 1; j <= n; j++)
-		if ((mask & (1 << j)) && j != i && j != 1)
-			res = std::min(res, fun(j, mask & (~(1 << i)))
-									+ dist[j][i]);
-	return memo[i][mask] = res;
+    for (int mask = 1; mask < (1 << n); mask++) {
+        for (int u = 0; u < n; u++) {
+            if ((mask & (1 << u)) == 0) continue;
+            for (int v = 0; v < n; v++) {
+                if (u == v || (mask & (1 << v))) continue;
+                dp[mask | (1 << v)][v] = min(dp[mask | (1 << v)][v], dp[mask][u] + graph[u][v]);
+            }
+        }
+    }
+
+
+    int ans = INF;
+    for (int i = 0; i < n; i++) {
+        ans = min(ans, dp[(1 << n) - 1][i] + graph[i][0]);
+    }
+    return ans;
 }
-int main()
-{
-	int ans = MAX;
-	for (int i = 1; i <= n; i++)
-		ans = std::min(ans, fun(i, (1 << (n + 1)) - 1
-								+ dist[i][1]);
 
-	printf("The cost of most efficient tour = %d", ans);
 
-	return 0;
+int main() {
+    int n = 4;
+    vector<vector<int>> graph = {
+        {0, 10, 15, 20},
+        {10, 0, 35, 25},
+        {15, 35, 0, 30},
+        {20, 25, 30, 0}
+    };
+
+
+    int minCost = tsp(graph, n);
+    cout << "Minimum cost to visit all cities: " << minCost << endl;
+
+
+    return 0;
 }
