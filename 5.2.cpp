@@ -1,53 +1,51 @@
 #include <iostream>
+#include <vector>
+#include <climits>
+
+
 using namespace std;
 
-int sum(int freq[], int i, int j); 
 
-int optimalSearchTree(int keys[], int freq[], int n) 
-{ 
-	int cost[n][n]; 
-
-	for (int i = 0; i < n; i++) 
-		cost[i][i] = freq[i]; 
-
-	for (int L = 2; L <= n; L++) 
-	{ 
-		for (int i = 0; i <= n-L+1; i++) 
-		{ 
-
-			int j = i+L-1; 
-			cost[i][j] = INT_MAX;
-			int off_set_sum = sum(freq, i, j);
-
-			for (int r = i; r <= j; r++) 
-			{ 
-
-			int c = ((r > i)? cost[i][r-1]:0) + 
-					((r < j)? cost[r+1][j]:0) + 
-					off_set_sum;
-			if (c < cost[i][j]) 
-				cost[i][j] = c; 
-			} 
-		} 
-	} 
-	return cost[0][n-1]; 
-} 
-
-int sum(int freq[], int i, int j) 
-{ 
-	int s = 0; 
-	for (int k = i; k <= j; k++) 
-	s += freq[k]; 
-	return s; 
-} 
+int cost(const vector<int>& freq, int i, int j) {
+    int sum = 0;
+    for (int k = i; k <= j; k++) {
+        sum += freq[k];
+    }
+    return sum;
+}
 
 
-int main() 
-{ 
-	int keys[] = {10, 12, 20}; 
-	int freq[] = {34, 8, 50}; 
-	int n = sizeof(keys)/sizeof(keys[0]); 
-	cout << "Cost of Optimal BST is " << optimalSearchTree(keys, freq, n); 
-	return 0; 
-} 
+int constructOBST(const vector<int>& keys, const vector<int>& freq) {
+    int n = keys.size();
+    vector<vector<int>> dp(n + 1, vector<int>(n + 1, 0));
 
+
+    for (int i = 0; i < n; i++) {
+        dp[i][i] = freq[i];
+    }
+
+
+    for (int len = 2; len <= n; len++) {
+        for (int i = 0; i <= n - len + 1; i++) {
+            int j = i + len - 1;
+            dp[i][j] = INT_MAX;
+            for (int r = i; r <= j; r++) {
+                int c = ((r > i) ? dp[i][r - 1] : 0) +
+                        ((r < j) ? dp[r + 1][j] : 0) + cost(freq, i, j);
+                if (c < dp[i][j]) {
+                    dp[i][j] = c;
+                }
+            }
+        }
+    }
+    return dp[0][n - 1];
+}
+
+
+int main() {
+    vector<int> keys = {10, 12, 20, 35};
+    vector<int> freq = {34, 8, 50, 25};
+    int minCost = constructOBST(keys, freq);
+    cout << "The cost of constructing optimal BST is: " << minCost << endl;
+    return 0;
+}
