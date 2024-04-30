@@ -1,50 +1,37 @@
-//1.4
-#include <stdio.h>
+#include <iostream>
+#include <cmath>
 
-// Function to check if there is an index i for which A[i] = i
-int findIndexEqualToValue(int arr[], int start, int end) {
-    if (start <= end) {
-        int mid = start + (end - start) / 2;
 
-        // Check if the current element is equal to its index
+bool isIndexEqualToValue(int arr[], int size) {
+    int low = 0;
+    int high = size - 1;
+
+
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
         if (arr[mid] == mid)
-            return mid;
-
-        // If the current element is greater than its index, search in the left subarray
-        if (arr[mid] > mid)
-            return findIndexEqualToValue(arr, start, mid - 1);
-        // If the current element is less than its index, search in the right subarray
+            return true;
+        else if (arr[mid] < mid)
+            low = mid + 1;
         else
-            return findIndexEqualToValue(arr, mid + 1, end);
+            high = mid - 1;
     }
 
-    // If no such index is found
-    return -1;
+
+    return false;
 }
 
+
 int main() {
-    int n;
+    int arr[] = {-10, -5, 0, 3, 7, 9, 12, 15};
+    int size = sizeof(arr) / sizeof(arr[0]);
 
-    // Get the size of the array from the user
-    printf("Enter the number of elements: ");
-    scanf("%d", &n);
 
-    int arr[n];
-
-    // Get sorted array elements from the user
-    printf("Enter %d sorted elements:\n", n);
-    for (int i = 0; i < n; i++) {
-        scanf("%d", &arr[i]);
-    }
-
-    // Find an index i for which A[i] = i
-    int result = findIndexEqualToValue(arr, 0, n - 1);
-
-    // Display the result
-    if (result != -1)
-        printf("Index %d satisfies A[%d] = %d.\n", result, result, result);
+    if (isIndexEqualToValue(arr, size))
+        std::cout << "Yes, there exists an index i for which A[i] = i.\n";
     else
-        printf("No such index found.\n");
+        std::cout << "No, there doesn't exist an index i for which A[i] = i.\n";
+
 
     return 0;
 }
